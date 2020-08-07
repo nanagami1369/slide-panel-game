@@ -162,20 +162,31 @@ export default class Game extends Vue {
 </script>
 
 <style scoped>
-#main {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+@media screen and (min-width: 0px) {
+  #main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .gameView {
+    width: 400px;
+    height: 400px;
+    border-collapse: collapse;
+    margin: 10px;
+  }
+  .panel {
+    height: calc(100% / 6);
+    width: calc(100% / 6);
+    border: solid 1px black;
+  }
 }
-.gameView {
-  width: 200px;
-  height: 200px;
-  border-collapse: collapse;
-  margin: 10px;
-}
-.panel {
-  height: calc(100% / 6);
-  width: calc(100% / 6);
-  border: solid 1px black;
+
+@media screen and (max-width: 480px) {
+  .gameView {
+    width: 40vh;
+    height: 40vh;
+    border-collapse: collapse;
+    margin: 10px;
+  }
 }
 </style>
