@@ -4,7 +4,11 @@
       <template v-for="(lines, y) in correctAnswer">
         <tr v-bind:key="createKey(y)">
           <template v-for="(_, x) in lines">
-            <td class="panel" v-bind:key="createKey(x,y)">{{correctAnswer[y][x]}}</td>
+            <td
+              class="panel"
+              v-bind:style="GetcolorPalette(correctAnswer[y][x])"
+              v-bind:key="createKey(x,y)"
+            >&nbsp;</td>
           </template>
         </tr>
       </template>
@@ -13,7 +17,12 @@
       <template v-for="(lines, y) in panels">
         <tr v-bind:key="createKey(y)">
           <template v-for="(_, x) in lines">
-            <td class="panel" v-touch:swipe="move(x,y)" v-bind:key="createKey(x,y)">{{panels[y][x]}}</td>
+            <td
+              class="panel"
+              v-bind:style="GetcolorPalette(panels[y][x])"
+              v-touch:swipe="move(x,y)"
+              v-bind:key="createKey(x,y)"
+            >&nbsp;</td>
           </template>
         </tr>
       </template>
@@ -23,6 +32,14 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+
+class Style {
+  public backgroundColor: string = ''
+
+  public constructor(backgroundColor: string) {
+    this.backgroundColor = backgroundColor
+  }
+}
 
 @Component
 export default class Game extends Vue {
@@ -36,9 +53,15 @@ export default class Game extends Vue {
   ]
   public correctAnswer: number[][] = new Array()
 
+  public readonly colorPalette: string[] = ['red', 'blue', 'green', 'yellow']
+
   public constructor() {
     super()
     this.panels.forEach(x => this.correctAnswer.push(x.slice(0)))
+  }
+
+  public GetcolorPalette(n: number): object {
+    return new Style(this.colorPalette[n])
   }
 
   public move(x: number, y: number): (direction: string) => void {
