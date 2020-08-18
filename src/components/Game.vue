@@ -1,37 +1,95 @@
 <template>
-  <main id="main">
-    <table class="gameView">
-      <template v-for="(lines, y) in correctAnswer">
-        <tr v-bind:key="createKey(y)">
-          <template v-for="(_, x) in lines">
-            <td
-              class="panel"
-              v-bind:style="GetcolorPalette(correctAnswer[y][x])"
-              v-bind:key="createKey(x,y)"
-            >&nbsp;</td>
-          </template>
-        </tr>
-      </template>
-    </table>
-    <table class="gameView">
-      <template v-for="(lines, y) in panels">
-        <tr v-bind:key="createKey(y)">
-          <template v-for="(_, x) in lines">
-            <td
-              class="panel"
-              v-bind:style="GetcolorPalette(panels[y][x])"
-              v-touch:swipe="move(x,y)"
-              v-bind:key="createKey(x,y)"
-            >&nbsp;</td>
-          </template>
-        </tr>
-      </template>
-    </table>
-  </main>
+  <div>
+    <div id="control">
+      <div>
+        {{Timer.viewString}}
+        <button v-show="Timer.isEnuable" v-on:click="disassemble">スタート</button>
+      </div>
+    </div>
+    <main id="main">
+      <table class="gameView">
+        <template v-for="(lines, y) in correctAnswer">
+          <tr v-bind:key="createKey(y)">
+            <template v-for="(_, x) in lines">
+              <td
+                class="panel"
+                v-bind:style="GetcolorPalette(correctAnswer[y][x])"
+                v-bind:key="createKey(x,y)"
+              >&nbsp;</td>
+            </template>
+          </tr>
+        </template>
+      </table>
+      <table class="gameView">
+        <template v-for="(lines, y) in panels">
+          <tr v-bind:key="createKey(y)">
+            <template v-for="(_, x) in lines">
+              <td
+                class="panel"
+                v-bind:style="GetcolorPalette(panels[y][x])"
+                v-touch:swipe="move(x,y)"
+                v-bind:key="createKey(x,y)"
+              >&nbsp;</td>
+            </template>
+          </tr>
+        </template>
+      </table>
+    </main>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+
+class Timer {
+  private _time: number = 0
+
+  public get time(): number {
+    return this._time
+  }
+
+  private _viewString: string = '0'
+
+  public get viewString(): string {
+    return this._viewString
+  }
+
+  private _timerId: number = -1
+
+  public isEnuable: boolean = true
+
+  public async Start(stopChecker: () => boolean): Promise<void> {
+    this.isEnuable = false
+    if (this._timerId !== -1) {
+      clearInterval(this._timerId)
+    }
+    this._viewString = '3'
+    await this.sleep(1000)
+    this._viewString = '2'
+    await this.sleep(1000)
+    this._viewString = '1'
+    await this.sleep(1000)
+    this._viewString = 'start'
+    await this.sleep(1000)
+    this._timerId = setInterval(() => {
+      this._viewString = this.time.toString()
+      this._time += 1
+      if (stopChecker()) {
+        if (this._timerId !== -1) {
+          clearInterval(this._timerId)
+          this._viewString = this.time + '秒でClear'
+          this.isEnuable = true
+        }
+      }
+    }, 1000)
+  }
+
+  private sleep(milliseconds: number): Promise<void> {
+    return new Promise<void>(resolve => {
+      setTimeout(() => resolve(), milliseconds)
+    })
+  }
+}
 
 class Style {
   public backgroundColor: string = ''
@@ -64,6 +122,10 @@ export default class Game extends Vue {
     return new Style(this.colorPalette[n])
   }
 
+  public isClear(): boolean {
+    return JSON.stringify(this.panels) === JSON.stringify(this.correctAnswer)
+  }
+
   public move(x: number, y: number): (direction: string) => void {
     return (direction: string) => {
       switch (direction) {
@@ -85,6 +147,8 @@ export default class Game extends Vue {
       }
     }
   }
+
+  public Timer: Timer = new Timer()
 
   public moveTop(column: number): void {
     if (0 <= column && column < this.getXSize()) {
@@ -147,7 +211,8 @@ export default class Game extends Vue {
     return Math.floor(Math.random() * Math.floor(max))
   }
 
-  public disassemble(): void {
+  public async disassemble(): Promise<void> {
+    await this.Timer.Start(this.isClear)
     const HowManyTimes = this.getXSize() + this.getYSize()
     this.moveRight(3)
     for (let index = 0; index < HowManyTimes; index++) {
@@ -163,6 +228,10 @@ export default class Game extends Vue {
 
 <style scoped>
 @media screen and (min-width: 0px) {
+  #control {
+    display: flex;
+    justify-content: center;
+  }
   #main {
     display: flex;
     flex-wrap: wrap;
