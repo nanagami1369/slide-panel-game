@@ -70,7 +70,6 @@ class Timer {
     this._viewString = '1'
     await this.sleep(1000)
     this._viewString = 'start'
-    await this.sleep(1000)
     this._timerId = setInterval(() => {
       this._viewString = this.time.toString()
       this._time += 1
