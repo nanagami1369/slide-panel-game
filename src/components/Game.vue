@@ -15,7 +15,7 @@
                 class="panel"
                 v-bind:style="GetcolorPalette(correctAnswer[y][x])"
                 v-bind:key="createKey(x,y)"
-              >&nbsp;</td>
+                >&nbsp;</td>
             </template>
           </tr>
         </template>
@@ -125,7 +125,7 @@ export default class Game extends Vue {
     return JSON.stringify(this.panels) === JSON.stringify(this.correctAnswer)
   }
 
-  public move(x: number, y: number): (direction: string) => void {
+  public move(x: number, y: number) {
     return (direction: string) => {
       switch (direction) {
         case 'top':
