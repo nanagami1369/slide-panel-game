@@ -1,4 +1,5 @@
 # slide-panel-game
+[![GitHub](https://img.shields.io/github/license/nanagami1369/slide-panel-game?color=%23204080)](https://github.com/nanagami1369/slide-panel-game/blob/develop/LICENSE)
 
 ## Project setup
 ```
